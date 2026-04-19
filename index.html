@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Fridge Scanner</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f4f4f9; }
+        #reader { width: 90%; max-width: 400px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .info { margin-top: 20px; text-align: center; color: #555; }
+    </style>
+</head>
+<body>
+    <h3>📸 Scan Item Barcode</h3>
+    <div id="reader"></div>
+    <div class="info">Point your camera at the barcode</div>
+
+    <script>
+        // 初始化 Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // 展開成全屏
+
+        const html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+        // 開始掃描
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            config,
+            (decodedText) => {
+                // 核心邏輯：掃描成功後，將數字發回給 Bot 並關閉視窗
+                tg.sendData(decodedText); 
+                tg.close();
+            },
+            (errorMessage) => {
+                // 忽略掃描過程中的暫時性報錯
+            }
+        ).catch((err) => {
+            console.error("Camera error:", err);
+            alert("Please allow camera access!");
+        });
+    </script>
+</body>
+</html>
